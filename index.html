@@ -47,6 +47,21 @@
 
   audio{display:none;}
   footer{color:var(--sub);font-size:11px;text-align:center;margin-top:30px;}
+
+  #seekBar{
+  margin-top:14px;display:flex;align-items:center;gap:10px;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 14px;
+}
+#seekBar span{font-family:var(--mono);font-size:12px;color:var(--sub);min-width:36px;}
+#seekBar input[type=range]{
+  flex:1;height:4px;-webkit-appearance:none;appearance:none;background:var(--line);border-radius:2px;outline:none;
+}
+#seekBar input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--amber);cursor:pointer;
+}
+#seekBar input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:var(--amber);border:none;cursor:pointer;
+}
 </style>
 </head>
 <body>
@@ -57,9 +72,17 @@
   <p>ボタンを押すと、そのパートの音源がすぐに再生されます。</p>
 </header>
 
+
 <div class="pads" id="pads"></div>
 <div id="nowPlaying">再生待機中</div>
 
+<div id="seekBar">
+  <span id="curTime">0:00</span>
+  <input type="range" id="seekRange" min="0" max="100" value="0" step="0.1">
+  <span id="durTime">0:00</span>
+</div>
+
+<audio id="player"></audio>
 <audio id="player"></audio>
 
 <footer>&nbsp;</footer>
@@ -132,6 +155,33 @@ function playPart(i){
     nowPlaying.className = '';
     render();
   });
+
+  const seekRange = document.getElementById('seekRange');
+const curTime = document.getElementById('curTime');
+const durTime = document.getElementById('durTime');
+
+function fmt(sec){
+  if(!isFinite(sec)) return '0:00';
+  const m = Math.floor(sec/60);
+  const s = Math.floor(sec%60);
+  return m + ':' + String(s).padStart(2,'0');
+}
+
+player.addEventListener('loadedmetadata', () => {
+  seekRange.max = player.duration;
+  durTime.textContent = fmt(player.duration);
+});
+
+player.addEventListener('timeupdate', () => {
+  if(!seekRange.matches(':active')){
+    seekRange.value = player.currentTime;
+  }
+  curTime.textContent = fmt(player.currentTime);
+});
+
+seekRange.addEventListener('input', () => {
+  player.currentTime = seekRange.value;
+});
 
   render();
 </script>
