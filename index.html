@@ -68,11 +68,24 @@
   // ここにパート名とmp3ファイル名を対応させて記入してください。
   // "file" は、このHTMLファイルと同じフォルダに置いたmp3ファイル名です。
   const PARTS = [
-    { name: "イントロ", file: "01_intro.mp3" },
-    { name: "Aメロ",   file: "02_a-melo.mp3" },
-    { name: "サビ",    file: "03_sabi.mp3" },
-    { name: "間奏",    file: "04_kansou.mp3" },
-    { name: "マスター", file: "Lost_Master.mp3"},
+    { name: "イントロ", file: ".mp3", label: "01" },
+    { name: "1A-1",   file: ".mp3", label: "幼くて無垢だった" },
+    { name: "1A-2",    file: ".mp3", label: "取り繕ったうそつき" },
+    { name: "1B-1",    file: ".mp3", label: "「きっと悪人だけじゃないよ」" },
+    { name: "1B-2",    file: ".mp3", label: "そう誰も、彼もが" },
+    { name: "1サビ-1",    file: ".mp3", label: "いつまで経っても" },
+    { name: "1サビ-2",    file: ".mp3", label: "数えたくもない傷跡" },
+    { name: "間奏",    file: ".mp3", label: "てれれれ" },
+    { name: "2A-1",    file: ".mp3", label: "愛されたくて" },
+    { name: "2A-2",    file: ".mp3", label: "これで良かったはずでしょ" },
+    { name: "2B-1",    file: ".mp3", label: "まって「ほらあの子がほしいよ」" },
+    { name: "2B-2",    file: ".mp3", label: "もう誰も" },
+    { name: "C-1",    file: ".mp3", label: "隠したナイフに" },
+    { name: "C-2",    file: ".mp3", label: "弱さも脆さも" },
+    { name: "ラスサビ-1",    file: ".mp3", label: "いつまで経っても" },
+    { name: "ラスサビ-2",    file: ".mp3", label: "認められなくていいから" },
+    { name: "",    file: ".mp3", label: "" },
+    { name: "マスター", file: "Lost_Master.mp3", label: "INTRO"},
   ];
 
   const pads = document.getElementById('pads');
@@ -86,8 +99,8 @@
       const pad = document.createElement('div');
       pad.className = 'pad' + (i === activeIdx ? ' playing' : '');
       pad.innerHTML =
-        '<div class="idx">PART ' + String(i+1).padStart(2,'0') + '</div>' +
-        '<div class="name"></div>';
+    '<div class="idx">' + (part.label || 'PART ' + String(i+1).padStart(2,'0')) + '</div>' +
+    '<div class="name"></div>';
       pad.querySelector('.name').textContent = part.name;
       pad.addEventListener('click', () => playPart(i));
       pads.appendChild(pad);
