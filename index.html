@@ -94,7 +94,17 @@
     });
   }
 
-  function playPart(i){
+function playPart(i){
+    // 再生中のボタンをもう一度押したら停止する
+    if(activeIdx === i && !player.paused){
+      player.pause();
+      activeIdx = -1;
+      nowPlaying.textContent = '再生待機中';
+      nowPlaying.className = '';
+      render();
+      return;
+    }
+
     activeIdx = i;
     player.src = PARTS[i].file;
     player.currentTime = 0;
@@ -104,8 +114,7 @@
     nowPlaying.textContent = '再生中: ' + PARTS[i].name;
     nowPlaying.className = 'active';
     render();
-  }
-
+}
   player.addEventListener('ended', () => {
     activeIdx = -1;
     nowPlaying.textContent = '再生待機中';
