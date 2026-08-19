@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>パート別再生プレーヤー</title>
+<style>
+  :root{
+    --bg:#181512;
+    --panel:#221e1a;
+    --panel-2:#2b2621;
+    --line:#3a332c;
+    --text:#f0e9df;
+    --sub:#a99d8c;
+    --amber:#e8934a;
+    --amber-dim:#5c4326;
+    --teal:#5fb3a3;
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);}
+  body{padding:24px 16px 60px;max-width:640px;margin:0 auto;}
+
+  header{margin-bottom:22px;}
+  header .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;color:var(--teal);text-transform:uppercase;}
+  header h1{font-size:22px;margin:4px 0 6px;font-weight:700;}
+  header p{color:var(--sub);font-size:13px;line-height:1.6;margin:0;}
+
+  .pads{display:grid;grid-template-columns:repeat(auto-fill, minmax(140px,1fr));gap:10px;margin-top:20px;}
+  .pad{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:10px;
+    padding:20px 10px;text-align:center;cursor:pointer;color:var(--text);
+    display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;
+    min-height:84px;transition:transform .06s ease, background .15s ease, border-color .15s ease;
+  }
+  .pad .idx{font-family:var(--mono);font-size:11px;color:var(--sub);letter-spacing:.08em;}
+  .pad .name{font-size:16px;font-weight:700;}
+  .pad:active{transform:scale(.96);}
+  .pad.playing{background:var(--amber-dim);border-color:var(--amber);}
+
+  #nowPlaying{
+    margin-top:20px;padding:10px 14px;background:var(--panel);border:1px solid var(--line);
+    border-radius:8px;font-family:var(--mono);font-size:12px;color:var(--sub);
+  }
+  #nowPlaying.active{color:var(--amber);}
+
+  audio{display:none;}
+  footer{color:var(--sub);font-size:11px;text-align:center;margin-top:30px;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Cue Pad Player</div>
+  <h1 id="songTitle">パート別再生プレーヤー</h1>
+  <p>ボタンを押すと、そのパートの音源がすぐに再生されます。</p>
+</header>
+
+<div class="pads" id="pads"></div>
+<div id="nowPlaying">再生待機中</div>
+
+<audio id="player"></audio>
+
+<footer>&nbsp;</footer>
+
+<script>
+  // ここにパート名とmp3ファイル名を対応させて記入してください。
+  // "file" は、このHTMLファイルと同じフォルダに置いたmp3ファイル名です。
+  const PARTS = [
+    { name: "イントロ", file: "01_intro.mp3" },
+    { name: "Aメロ",   file: "02_a-melo.mp3" },
+    { name: "サビ",    file: "03_sabi.mp3" },
+    { name: "間奏",    file: "04_kansou.mp3" },
+  ];
+
+  const pads = document.getElementById('pads');
+  const player = document.getElementById('player');
+  const nowPlaying = document.getElementById('nowPlaying');
+  let activeIdx = -1;
+
+  function render(){
+    pads.innerHTML = '';
+    PARTS.forEach((part, i) => {
+      const pad = document.createElement('div');
+      pad.className = 'pad' + (i === activeIdx ? ' playing' : '');
+      pad.innerHTML =
+        '<div class="idx">PART ' + String(i+1).padStart(2,'0') + '</div>' +
+        '<div class="name"></div>';
+      pad.querySelector('.name').textContent = part.name;
+      pad.addEventListener('click', () => playPart(i));
+      pads.appendChild(pad);
+    });
+  }
+
+  function playPart(i){
+    activeIdx = i;
+    player.src = PARTS[i].file;
+    player.currentTime = 0;
+    player.play().catch(err => {
+      nowPlaying.textContent = '再生に失敗しました: ' + err.message;
+    });
+    nowPlaying.textContent = '再生中: ' + PARTS[i].name;
+    nowPlaying.className = 'active';
+    render();
+  }
+
+  player.addEventListener('ended', () => {
+    activeIdx = -1;
+    nowPlaying.textContent = '再生待機中';
+    nowPlaying.className = '';
+    render();
+  });
+
+  render();
+</script>
+
+</body>
+</html>
